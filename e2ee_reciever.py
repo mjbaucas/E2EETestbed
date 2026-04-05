@@ -49,10 +49,10 @@ while True:
     message = connection.recv(4096)
     message = json.loads(message.decode("utf-8"))
 
-    encrypted_aes_key = base64.b64decode(data["secret-key"])
-    iv = base64.b64decode(data["iv"])
-    ciphertext = base64.b64decode(data["data"])
-    signature = base64.b64decode(data["signature"])
+    encrypted_aes_key = base64.b64decode(message["secret-key"])
+    iv = base64.b64decode(message["iv"])
+    ciphertext = base64.b64decode(message["data"])
+    signature = base64.b64decode(message["signature"])
 
     plaintext = receiver_verify_and_decrypt(encrypted_aes_key, iv, ciphertext, signature, sender_public_key, receiver_private_key)
     response = json.dumps({"response": plaintext})

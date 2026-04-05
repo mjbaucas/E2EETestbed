@@ -65,7 +65,7 @@ for i in range(3):
             s.connect(("192.168.137.1", 5000))
             data = "Hello".encode('utf-8')
 
-            data = generate_data(char_counts[sys.argv[1]])
+            data = generate_data(char_counts[int(sys.argv[1])])
             enc_aes_key, iv, enc_data, signature = sender_encrypt_and_sign(data, receiver_public_key, sender_private_key)
 
             message = json.dumps({

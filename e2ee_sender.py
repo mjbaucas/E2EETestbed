@@ -54,7 +54,7 @@ for i in range(3):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("192.168.137.1", 5000))
-            data = "Hello"
+            data = "Hello".encode('utf-8')
             enc_aes_key, iv, enc_data, signature = sender_encrypt_and_sign(data, receiver_public_key, sender_private_key)
 
             message = json.dumps({

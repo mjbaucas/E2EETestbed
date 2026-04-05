@@ -45,7 +45,7 @@ while True:
     print('Server is now running.')
     connection, address = s.accept()
     print(address)
-
+    message = connection.recv(4096)
     message = json.loads(message.decode("utf-8"))
 
     plaintext = receiver_verify_and_decrypt(message["secret-key"], message["iv"], message["data"], message["signature"], sender_public_key, receiver_private_key)

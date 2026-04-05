@@ -55,7 +55,7 @@ while True:
     signature = base64.b64decode(message["signature"])
 
     plaintext = receiver_verify_and_decrypt(encrypted_aes_key, iv, ciphertext, signature, sender_public_key, receiver_private_key)
-    response = json.dumps({"response": plaintext})
+    response = json.dumps({"response": base64.b64encode(plaintext).decode()})
     connection.sendall(bytes(str(response), "utf-8"))
     connection.shutdown(socket.SHUT_RDWR)
     connection.close()

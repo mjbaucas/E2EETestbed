@@ -29,7 +29,7 @@ for i in range(3):
             data = generate_data(char_counts[int(sys.argv[1])])
             
             message = json.dumps({
-                "data": data
+                "data": base64.b64encode(data).decode()
             }).encode()
 
             s.sendall(struct.pack("!I", len(message)))  # send length

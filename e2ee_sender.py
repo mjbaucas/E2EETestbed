@@ -70,7 +70,7 @@ for i in range(3):
             if message != "":
                 #print(message)
                 message = json.loads(message)
-                print(base64.b64decode(message))
+                print(base64.b64decode(message["response"]))
                 end = time.time()
                 elapsed = end-start
                 if elapsed > 0:

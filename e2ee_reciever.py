@@ -9,6 +9,7 @@ import time
 import sys
 import json
 import base64
+import struct
 
 sender_private_key = b"""-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAnjVoEHHoXYVkOB+PN2s5QBfvPCIlraKVXvB+DHvXKI/Wrt7x\nfhi1xmD6pJifVjczegm4Nq3UmDyaI/dVUOvmrJl2KF2G6xc6QIMCyCH4cLs/Trw3\ngS5vDwPQQj0eG9CpwRavMHrXuhUl2GASGh4aoWwxumCC0BIzt9XCpcoo9byD9ios\nECXxkSkwb22sqqkO1d6mL2PiZlK3fsH/3TxUhn7VOggT2ssBrXDjFBTvyllGcPIG\nH1Opt8Wd92APi/90D36XXyUpKdLOdlsRC8ZAgBaj/v/oefTAoMm5G1XUc0Za8vzW\nQRSn7msb9QrCUyWfDgnUzPIYUV7naQ6n43PzBwIDAQABAoIBAAaOxyf7WLrbpxpO\ncJTG/IIEG/X9olsupIthY5An5/S19ZudARyNcKdu6KS+8MfVlOwnj/uwO+ItjOQV\nwfMPPCoGWGf27Hs9JLx80bYy9kXR9R9R3OkdYBwat9yvBNr5TLgEtTFIvj1n2AA+\nhzGO8uKjBfKoQnPWdU9W7HELzqPU4mAxSeFhOFcal/p+DPHdLoeV14X93+q7jIzm\naKIHVO4ybstTlGuMALVXXVpL+HFywuTmPJOoM3GBlJ+E3/Vc69c4LwOnkkg6oP0n\nFhXXfZVSgfhpfhgvBJJ0CHA1xpDDOCKHiNGXt4bfraWLKq0uKXZiznYfBD7Q8X1S\nVHieRikCgYEAwvNt7uHacws5SNgWAAUQpmBRsERf2KwNcPfylUyOKv5q3kkU5Eh7\nC8lMsP7cfVxR6vOEX6hNXRaSx9uRqgNGTRvILmKKNDLEUyZTB9SyHMuuEU9H1gVl\nwArv33PyER3Nxvdu3NmwfHBiXLlchFRNCD5wk5tuiCXOwRswKB3HehkCgYEAz8B4\nSS4w8fuBoypmSZAMwYlyeB/wxlYxLQou4I7kotyHaHmDlW6OUpb//VdMcz0NZ01C\nicd6fIfYlyXLtoKP2zfAMF1JTgol+UiUVdaSJNps4WIp9Y3yBfWumtIbXJAPjvbr\nwZo61bnzZmRcwHvSczsxs1LUVqcvzwOUKgUGuh8CgYEAg8EJVx0FCiNXv8dqdvD1\nY7xM+Rf8vu7o1qR8KjLnEl+H0lsJ546kuj59ulFEquSt6GBT4mJYhsUuxiu6snAs\nHwjbrZ2jUcvNq3SHQQ+aoKN3LPOr1RUowzWhEB/IRZEi9YlcP55QDInXsFsGD9j5\nhszMQLYXaaRDq3a4gSQ/IGECgYA/kV/83GJjmJZpK68SsT4F9h2NfhB5T6RKaMRB\nN9fjsWDJae0GS0bHJKb9iLm+xR6VzkEe0We8NQDj9s+nb7m+1Qc8hT7J3zcRWNDy\nlu4u0prgN94o4Z79jdg4TTPMFdR85TbsDVoVTYmZefobd4fEdIdXnG+WeB+b0zeB\nx/nv9wKBgCRw5lDHI1zKQp97r7Q/6Vuuo2fgAzoZUjXNPtKhv44cvniHCzMgK41S\nTOPjB+Yi/zsbKUh89erJX8OqE3usP+ynNeXVl2X/fm2QY1WNO+kUkwl+EcdOFoYq\nYBs6LWhWyAtVB5k/yRBnmnNHMyYAs5AZE9rBCOdY4J68JFl2cpaI\n-----END RSA PRIVATE KEY-----"""
 sender_public_key = b"""-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnjVoEHHoXYVkOB+PN2s5\nQBfvPCIlraKVXvB+DHvXKI/Wrt7xfhi1xmD6pJifVjczegm4Nq3UmDyaI/dVUOvm\nrJl2KF2G6xc6QIMCyCH4cLs/Trw3gS5vDwPQQj0eG9CpwRavMHrXuhUl2GASGh4a\noWwxumCC0BIzt9XCpcoo9byD9iosECXxkSkwb22sqqkO1d6mL2PiZlK3fsH/3TxU\nhn7VOggT2ssBrXDjFBTvyllGcPIGH1Opt8Wd92APi/90D36XXyUpKdLOdlsRC8ZA\ngBaj/v/oefTAoMm5G1XUc0Za8vzWQRSn7msb9QrCUyWfDgnUzPIYUV7naQ6n43Pz\nBwIDAQAB\n-----END PUBLIC KEY-----"""
@@ -46,8 +47,17 @@ while True:
     print('Server is now running.')
     connection, address = s.accept()
     print(address)
-    message = connection.recv(4096)
-    message = json.loads(message.decode("utf-8"))
+
+    raw_len = s.recv(4)
+    msg_len = struct.unpack("!I", raw_len)[0]
+
+    # read full message
+    data = b''
+    while len(data) < msg_len:
+        data += s.recv(4096)
+
+    json_data = data.decode()
+    message = json.loads(json_data)
 
     encrypted_aes_key = base64.b64decode(message["secret-key"])
     iv = base64.b64decode(message["iv"])
@@ -55,8 +65,8 @@ while True:
     signature = base64.b64decode(message["signature"])
 
     plaintext = receiver_verify_and_decrypt(encrypted_aes_key, iv, ciphertext, signature, sender_public_key, receiver_private_key)
-    print(plaintext)
-    response = json.dumps({"response": base64.b64encode(plaintext).decode()})
+    #print(plaintext)
+    response = json.dumps({"response": "received"})
     connection.sendall(bytes(str(response), "utf-8"))
     connection.shutdown(socket.SHUT_RDWR)
     connection.close()

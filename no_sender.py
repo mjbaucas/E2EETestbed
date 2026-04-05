@@ -2,6 +2,7 @@ import socket
 import time 
 import sys
 import json
+import base64
 
 import random
 import string

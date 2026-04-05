@@ -28,8 +28,12 @@ for i in range(3):
             
             data = generate_data(char_counts[int(sys.argv[1])])
             
-            s.sendall(struct.pack("!I", len(data)))  # send length
-            s.sendall(data)
+            message = json.dumps({
+                "data": data
+            }).encode()
+
+            s.sendall(struct.pack("!I", len(message)))  # send length
+            s.sendall(message)
             
             message = s.recv(4096).decode("utf-8")
                 

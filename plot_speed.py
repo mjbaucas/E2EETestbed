@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-dataX = ["1M","2M","3M","4M","5M","6M","7M","8M","9M","10M"]
+dataX = ["1","2","3","4","5","6","7","8","9","10"]
 
 aes_rsa = [0.0016, 0.0025, 0.0033, 0.0043, 0.0053, 0.0067, 0.0079, 0.0084, 0.0102, 0.0106]
 aes_ecc = [0.0013, 0.0021, 0.0031, 0.0041, 0.0051, 0.0062, 0.0071, 0.0081, 0.0096, 0.0104]
@@ -13,7 +13,7 @@ def plot_data(dataX, aes_rsa, aes_ecc, cha_rsa, cha_ecc, name):
     plt.plot(dataX,aes_ecc,marker='o', ms=8,label="AES + ECC", color="green")
     plt.plot(dataX,cha_rsa,marker='^', ms=8, label="ChaCha20 + RSA", color="darkcyan")
     plt.plot(dataX,cha_ecc,marker='*', ms=8,label="ChaCha20 + ECC", color="red")
-    plt.xlabel("Character Length")
+    plt.xlabel("Character Length (MB)")
     plt.ylabel("Encryption Time (s)")
     plt.legend()
     plt.grid(linestyle = '--', linewidth = 0.5)

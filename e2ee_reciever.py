@@ -48,13 +48,13 @@ while True:
     connection, address = s.accept()
     print(address)
 
-    raw_len = s.recv(4)
+    raw_len = connection.recv(4)
     msg_len = struct.unpack("!I", raw_len)[0]
 
     # read full message
     data = b''
     while len(data) < msg_len:
-        data += s.recv(4096)
+        data += connection.recv(4096)
 
     json_data = data.decode()
     message = json.loads(json_data)
